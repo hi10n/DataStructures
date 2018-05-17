@@ -6,15 +6,21 @@
 
 using namespace std;
 
+// -------------------------------------------------------
+// Max weights to reach the last or the second last element
+// -------------------------------------------------------
 typedef struct
 {
-    uint32_t maxWToLastElement;
-    uint32_t maxWToSecondLastElement;
+    uint32_t maxWToLastElement;		///< Max weight to reach the last element
+    uint32_t maxWToSecondLastElement;	///< Max weight to reach the second to last element
 } MaxWeights;
 
 static const uint32_t MaxNumbers = 1000;
-static MaxWeights     FinalWeights[MaxNumbers];
+static MaxWeights     FinalWeights[MaxNumbers];	///< Final weights of each node to reach the last or second to last element
 
+// ----------------------------------------------------------------------------------
+// DFS like recursive function to get the max sub array with no two elements adjacent
+// ----------------------------------------------------------------------------------
 void MaxSubArray(vector<uint32_t>* pNumVec,
                  uint32_t          index,
                  uint32_t          totalNumbers,
@@ -25,6 +31,7 @@ void MaxSubArray(vector<uint32_t>* pNumVec,
     MaxWeights max2Weights        = { 0 };
     MaxWeights max3Weights        = { 0 };
     
+    // If we have already determined the final weights of reaching the last and the second to last element we simply use that information
     if ((FinalWeights[index].maxWToLastElement == 0) && (FinalWeights[index].maxWToSecondLastElement == 0))
     {
         if ((it + index + 2) < pNumVec->end()) // Have we reached the last element in the DFS path
@@ -39,6 +46,7 @@ void MaxSubArray(vector<uint32_t>* pNumVec,
             FinalWeights[index].maxWToLastElement       = max(max2Weights.maxWToLastElement, max3Weights.maxWToLastElement);
             FinalWeights[index].maxWToSecondLastElement = max(max2Weights.maxWToSecondLastElement, max3Weights.maxWToSecondLastElement);
             
+	    // Update only if the last or second to last element can be reached from the current element
             if (FinalWeights[index].maxWToLastElement > 0)
             {
                 FinalWeights[index].maxWToLastElement += currentValue;
@@ -51,6 +59,7 @@ void MaxSubArray(vector<uint32_t>* pNumVec,
         }
         else
         {
+            // These are the "terminal nodes" in the graph
             if (index == totalNumbers - 1)
             {
                 FinalWeights[index].maxWToLastElement = currentValue;
@@ -65,6 +74,9 @@ void MaxSubArray(vector<uint32_t>* pNumVec,
     *pPerIndexWeights = FinalWeights[index];
 }
 
+// -----------------------------------------
+// Main entry point to find the max subarray
+// -----------------------------------------
 uint32_t FindMaxSubArray(vector<uint32_t>* pNumVec, uint32_t totalNumbers)
 {
     uint32_t   maxPath = 0;
